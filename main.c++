@@ -4,9 +4,8 @@
 #include <cstring>
 #include <stdio.h>
 #include <stdarg.h>
-#include <algorithm> // Untuk fitur pencarian (search)
+#include <algorithm>
 
-// --- FIX LINKER MINGW ---
 #ifdef __MINGW32__
 extern "C" int __mingw_vsscanf(const char *buffer, const char *format, va_list argp) {
     return vsscanf(buffer, format, argp);
@@ -20,17 +19,15 @@ extern "C" int __mingw_vsscanf(const char *buffer, const char *format, va_list a
 
 using namespace std;
 
-// --- 1. STATE & GLOBAL DATA ---
 enum AppState { LOGIN, ADMIN_DASHBOARD, USER_HOME };
 AppState currentState = LOGIN;
 
-// Forward Declaration agar UI kenal Class
+// Forward Declaration
 class User;
 class Anggota;
 class Buku;
 
-// --- 2. CLASS MODEL ---
-
+// Class User
 class User {
 protected:
     string idUser, nama, username, role;
@@ -44,6 +41,7 @@ public:
     string getRole() { return role; }
 };
 
+// Class Anggota (Turunan User)
 class Anggota : public User {
 private:
     string alamat, password;
@@ -55,6 +53,7 @@ public:
     string getAlamat() { return alamat; }
 };
 
+// Class Buku
 class Buku {
 private:
     string idBuku, judul, penulis;
@@ -68,8 +67,7 @@ public:
     void setStatus(bool status) { isTersedia = status; }
 };
 
-// --- 3. CLASS TRANSAKSI (Ditaruh di atas agar dikenal UI) ---
-
+// Class Transaksi
 class Transaksi {
 protected:
     string idTransaksi, tanggal;
@@ -78,6 +76,7 @@ public:
     virtual ~Transaksi() {}
 };
 
+// Class Pengembalian (Turunan Transaksi)
 class Pengembalian : public Transaksi {
 private:
     int dendaPerHari = 2000;
@@ -95,7 +94,7 @@ public:
     }
 };
 
-// --- 4. GLOBAL VARIABLES ---
+// Global Variabel
 vector<Buku> daftarBuku;
 vector<Anggota> daftarAnggota;
 vector<string> logAktivitas;
@@ -103,12 +102,11 @@ User* currentUser = nullptr;
 int inputHari[1000] = {0};
 int menuAdmin = 0;
 
-// --- 5. FUNGSI UI PROTOTYPES ---
 void DrawLoginPage();
 void DrawAdminDashboard();
 void DrawUserHome();
 
-// --- 6. IMPLEMENTASI FUNGSI UI ---
+//Implementasi fungsi ui
 
 void SetupTokyoNightTheme() {
     ImGuiStyle &style = ImGui::GetStyle();
@@ -192,7 +190,7 @@ void DrawAdminDashboard() {
         }
         ImGui::Separator();
         
-        // FITUR PENCARIAN
+        // Search
         ImGui::Text("Pencarian:"); ImGui::SameLine();
         ImGui::InputText("##searchBuku", searchBuku, 128);
 
@@ -286,7 +284,7 @@ void DrawUserHome() {
     ImGui::End();
 }
 
-// --- 7. MAIN PROGRAM ---
+// Main Program
 int main() {
     if (!glfwInit()) return -1;
     GLFWwindow *window = glfwCreateWindow(1280, 720, "MNC Library System", NULL, NULL);
